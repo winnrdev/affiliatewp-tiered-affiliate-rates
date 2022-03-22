@@ -34,6 +34,24 @@ class AffWP_Tiered_Rates {
 	 */
 	public function get_tiered_affiliate_rate( $rate, $affiliate_id, $type ) {
 
+		//
+		$pro_cat = [];
+		
+		//  foreach( WC()->cart->get_cart() as $product ){
+		// 	If( !empty( $product['product_id'] ) ){
+		// 		$cat = wp_get_object_terms( $product['product_id'], 'product_cat' , array( 'fields' => 'slugs' ) ) ;
+		// 		if( !empty( $cat ) ){
+		// 			foreach ($cat as $key => $value) {
+		// 				$pro_cat[] = $value;
+		// 			}
+		// 		}
+		// 	}
+		//  } 
+		
+		$pro_cat = array_unique( $pro_cat );
+		//
+
+
 		$has_tiered_rate = false;
 
 		$rates          = affwp_get_tiered_rates();
@@ -87,9 +105,25 @@ class AffWP_Tiered_Rates {
 
 			if ( $has_tiered_rate && 'percentage' == $type ) {
 				// Sanitize the rate and ensure it's in the proper format
-				if ( $rate > 0 ) {
-					$rate = $rate / 100;
+
+				if( $tiered_rate[ 'product' ] == 'ks' && in_array( 'knowledge-share', $pro_cat ) &&  $earnings >= affwp_sanitize_amount( $tiered_rate['threshold'] ) ){
+					if ( $rate > 0 && $tiered_rate['rate'] > 0) {
+						$rate = $rate / $tiered_rate['rate'];
+					}
+				}elseif( $tiered_rate[ 'product' ] == 'mco' && in_array( 'mastery-community', $pro_cat ) &&  $earnings >= affwp_sanitize_amount( $tiered_rate['threshold'] ) ){
+					if ( $rate > 0 && $tiered_rate['rate'] > 0) {
+						$rate = $rate / $tiered_rate['rate'];
+					}
+				}elseif( $tiered_rate[ 'product' ] == 'mci' && in_array( 'mastery-circle', $pro_cat ) &&  $earnings >= affwp_sanitize_amount( $tiered_rate['threshold'] ) ){
+					if ( $rate > 0 && $tiered_rate['rate'] > 0) {
+						$rate = $rate / $tiered_rate['rate'];
+					}
 				}
+
+
+				// if ( $rate > 0 ) {
+				// 	$rate = $rate / 100;
+				// }
 			}
 
 		}

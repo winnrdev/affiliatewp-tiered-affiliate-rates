@@ -149,7 +149,9 @@ class AffiliateWP_Rates_Admin {
 			<table id="affiliatewp-rates" class="form-table wp-list-table widefat fixed posts">
 				<thead>
 					<tr>
+						
 						<th><?php _e( 'Type', 'affiliate-wp-tiered' ); ?></th>
+						<th><?php _e( 'Product', 'affiliate-wp-tiered' ); ?></th>
 						<th><?php _e( 'Threshold', 'affiliate-wp-tiered' ); ?></th>
 						<th><?php _e( 'Rate', 'affiliate-wp-tiered' ); ?></th>
 						<th><?php _e( 'Disabled', 'affiliate-wp-tiered' ); ?></th>
@@ -160,6 +162,7 @@ class AffiliateWP_Rates_Admin {
 					<?php if( $rates ) : ?>
 						<?php foreach( $rates as $key => $rate ) :
 							$type = ! empty( $rate['type'] ) ? $rate['type'] : 'referrals';
+							$product = ! empty( $rate['product'] ) ? $rate['product'] : 'ks';
 							$disabled = isset( $rate['disabled'] );
 
 							if ( $disabled ) :
@@ -169,10 +172,18 @@ class AffiliateWP_Rates_Admin {
 							endif;
 							?>
 							<tr>
+								
 								<td>
 									<select name="affwp_settings[rates][<?php echo $key; ?>][type]">
 										<option value="referrals"<?php selected( 'referrals', $type ); ?>><?php _e( 'Number of Referrals', 'affiliate-wp-tiered' ); ?></option>
 										<option value="earnings"<?php selected( 'earnings', $type ); ?>><?php _e( 'Total Referral Earnings', 'affiliate-wp-tiered' ); ?></option>
+									</select>
+								</td>
+								<td>
+									<select name="affwp_settings[rates][<?php echo $key; ?>][product]">
+										<option value="ks"<?php selected( 'ks', $product ); ?>><?php _e( 'Knowledge Share', 'affiliate-wp-tiered' ); ?></option>
+										<option value="mco"<?php selected( 'mco', $product ); ?>><?php _e( 'Mastery Community', 'affiliate-wp-tiered' ); ?></option>
+										<option value="mci"<?php selected( 'mci', $product ); ?>><?php _e( 'MMastery Circle', 'affiliate-wp-tiered' ); ?></option>
 									</select>
 								</td>
 								<td>
@@ -219,7 +230,7 @@ class AffiliateWP_Rates_Admin {
 						<th colspan="1">
 							<button id="affwp_new_rate" name="affwp_new_rate" class="button"><?php _e( 'Add New Rate', 'affiliate-wp-tiered' ); ?></button>
 						</th>
-						<th colspan="4">
+						<th colspan="5">
 							<?php _e( 'Add rates from low to high', 'affiliate-wp-tiered' ); ?>
 						</th>
 					</tr>
