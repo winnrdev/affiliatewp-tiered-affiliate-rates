@@ -172,3 +172,52 @@ class AffiliateWP_TR_Requirements_Check extends AffiliateWP_Requirements_Check {
 $requirements = new AffiliateWP_TR_Requirements_Check( __FILE__ );
 
 $requirements->maybe_load();
+
+
+function calc_per_order_referral_amount( $referral_amount, $affiliate_id, $amount, $reference, $product_id, $context ){
+
+	
+	//get_product_category
+	$pro_cat = null;
+	$cat = wp_get_object_terms( $product_id, 'product_cat' , array( 'fields' => 'slugs' ) ) ;
+	if( !empty( $cat ) ){
+		foreach ($cat as $key => $value) {
+			$pro_cat = $value;
+			break;
+		}
+	}
+
+	//current user
+	$current_user = affwp_get_affiliate( $affiliate_id ) -> user_id;
+
+	//rates
+	$rates = affwp_get_tiered_rates();
+
+	$selected_cat = [];
+	foreach ($rates as $key => $value) {
+		$selected_cat[] = $value['product'];
+	}
+
+	if( in_array( $pro_cat, $selected_cat ) ){
+		$total_refer = get_user_meta( $current_user, "affwp_tiered_".$value['product'], true );
+		if( !empty( $total_refer ) && is_numeric( $total_refer ) ){
+			$total_refer = $total_refer + 1;
+		}else{
+			$total_refer = 1;	
+		}
+		update_user_meta( $current_user, "affwp_tiered_".$value['product'], $total_refer );
+
+		if( !empty( $rates ) && is_array( $rates ) ){ 
+			foreach ($rates as $key => $value) {
+				if( $value['type'] == "referrals" && $value['product'] == $pro_cat && empty( $value['disabled'] ) && $value['threshold'] <= $total_refer ){					
+					if( !empty( $value['rate'] ) &&  is_numeric( $value['rate'] ) && !empty( $amount ) && is_numeric( $amount ) ){
+						$referral_amount =  $amount / $value['rate'] ;
+					}
+				}
+			}
+		}
+	}
+
+	return $referral_amount;
+
+}

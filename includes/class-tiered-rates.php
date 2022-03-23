@@ -20,7 +20,7 @@ class AffWP_Tiered_Rates {
 		if ( is_admin() ) {
 			add_filter( 'affwp_affiliate_table_rate', array( $instance, 'filter_affiliate_table_rate' ), 10, 2 );
 		}
-
+		add_filter( 'affwp_calc_referral_amount', 'calc_per_order_referral_amount', 10, 6 );
 		add_filter( 'affwp_get_affiliate_rate', array( $instance, 'get_tiered_affiliate_rate'  ), 10, 3 );
 		add_filter( 'affwp_tiered_rates',       array( $instance, 'remove_disabled_rate_tiers' )        );
 	}
@@ -106,24 +106,11 @@ class AffWP_Tiered_Rates {
 			if ( $has_tiered_rate && 'percentage' == $type ) {
 				// Sanitize the rate and ensure it's in the proper format
 
-				if( $tiered_rate[ 'product' ] == 'ks' && in_array( 'knowledge-share', $pro_cat ) &&  $earnings >= affwp_sanitize_amount( $tiered_rate['threshold'] ) ){
-					if ( $rate > 0 && $tiered_rate['rate'] > 0) {
-						$rate = $rate / $tiered_rate['rate'];
-					}
-				}elseif( $tiered_rate[ 'product' ] == 'mco' && in_array( 'mastery-community', $pro_cat ) &&  $earnings >= affwp_sanitize_amount( $tiered_rate['threshold'] ) ){
-					if ( $rate > 0 && $tiered_rate['rate'] > 0) {
-						$rate = $rate / $tiered_rate['rate'];
-					}
-				}elseif( $tiered_rate[ 'product' ] == 'mci' && in_array( 'mastery-circle', $pro_cat ) &&  $earnings >= affwp_sanitize_amount( $tiered_rate['threshold'] ) ){
-					if ( $rate > 0 && $tiered_rate['rate'] > 0) {
-						$rate = $rate / $tiered_rate['rate'];
-					}
+
+
+				if ( $rate > 0 ) {
+					$rate = $rate / 100;
 				}
-
-
-				// if ( $rate > 0 ) {
-				// 	$rate = $rate / 100;
-				// }
 			}
 
 		}
