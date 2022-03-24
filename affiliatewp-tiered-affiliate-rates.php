@@ -173,7 +173,6 @@ $requirements = new AffiliateWP_TR_Requirements_Check( __FILE__ );
 
 $requirements->maybe_load();
 
-
 function calc_per_order_referral_amount( $referral_amount, $affiliate_id, $amount, $reference, $product_id, $context ){
 
 	
@@ -194,9 +193,28 @@ function calc_per_order_referral_amount( $referral_amount, $affiliate_id, $amoun
 	$rates = affwp_get_tiered_rates();
 
 	$selected_cat = [];
+	$ranges = [];
 	foreach ($rates as $key => $value) {
 		$selected_cat[] = $value['product'];
+		$ranges[ $value['product'] ][ $key ] = $value['threshold'];
 	}
+	
+	// create range of threshold
+	foreach( $ranges as $k => $v ){
+		
+		$min = 0;
+		foreach( $v as $kn => $kv ){
+
+			$max = $kv;
+			
+			$rates[$kn]['min_th'] = $min;
+			$rates[$kn]['max_th'] = $max;
+
+			$min = $kv;
+		}
+	}
+
+	
 
 	if( in_array( $pro_cat, $selected_cat ) ){
 		$total_refer = get_user_meta( $current_user, "affwp_tiered_".$value['product'], true );
@@ -205,19 +223,21 @@ function calc_per_order_referral_amount( $referral_amount, $affiliate_id, $amoun
 		}else{
 			$total_refer = 1;	
 		}
+		
 		update_user_meta( $current_user, "affwp_tiered_".$value['product'], $total_refer );
 
 		if( !empty( $rates ) && is_array( $rates ) ){ 
 			foreach ($rates as $key => $value) {
-				if( $value['type'] == "referrals" && $value['product'] == $pro_cat && empty( $value['disabled'] ) && $value['threshold'] <= $total_refer ){					
+				if( $value['type'] == "referrals" && $value['product'] == $pro_cat && empty( $value['disabled'] ) && empty($value['disabled']) && ( $total_refer > $value['min_th'] && $total_refer <= $value['max_th'] ) ){					
 					if( !empty( $value['rate'] ) &&  is_numeric( $value['rate'] ) && !empty( $amount ) && is_numeric( $amount ) ){
-						$referral_amount =  $amount / $value['rate'] ;
+						$referral_amount =  $amount / $value['rate'] ;	
+						pr( $value );
 					}
 				}
 			}
 		}
 	}
-
+	
 	return $referral_amount;
 
 }
